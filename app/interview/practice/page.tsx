@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { ProtectedRoute } from '@/hooks/useAuth';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
-import { getRandomQuestion } from '@/lib/questions';
+import { getRandomQuestion, questions } from '@/lib/questions';
 import type { InterviewQuestion } from '@/types';
 import { useRouter } from 'next/navigation';
 import {
@@ -23,6 +23,11 @@ interface RecordingState {
   preparationTime: number;
 }
 
+interface AppState {
+  showQuestionSelection: boolean;
+  selectedQuestion: InterviewQuestion | null;
+}
+
 function InterviewPracticePage() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,7 +35,10 @@ function InterviewPracticePage() {
   const streamRef = useRef<MediaStream | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   
-  const [question, setQuestion] = useState<InterviewQuestion | null>(null);
+  const [appState, setAppState] = useState<AppState>({
+    showQuestionSelection: true,
+    selectedQuestion: null
+  });
   const [recordingState, setRecordingState] = useState<RecordingState>({
     isRecording: false,
     isPreparing: false,
@@ -41,14 +49,12 @@ function InterviewPracticePage() {
   const [error, setError] = useState<string>('');
   const [mediaSupported, setMediaSupported] = useState(false);
 
-  // Initialize camera and question
+  // Initialize camera when question is selected
   useEffect(() => {
-    const initializeSession = async () => {
-      try {
-        // Get random question
-        const selectedQuestion = getRandomQuestion();
-        setQuestion(selectedQuestion);
+    if (!appState.selectedQuestion) return;
 
+    const initializeCamera = async () => {
+      try {
         // Check media support
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           setError('お使いのブラウザはカメラ機能をサポートしていません。');
@@ -75,7 +81,7 @@ function InterviewPracticePage() {
         }
         setMediaSupported(true);
       } catch (err) {
-        console.error('Error initializing session:', err);
+        console.error('Error initializing camera:', err);
         let errorMessage = 'カメラまたはマイクへのアクセスに問題があります。';
         
         if (err instanceof Error) {
@@ -92,7 +98,7 @@ function InterviewPracticePage() {
       }
     };
 
-    initializeSession();
+    initializeCamera();
 
     return () => {
       // Cleanup
@@ -100,7 +106,7 @@ function InterviewPracticePage() {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, []);
+  }, [appState.selectedQuestion]);
 
   // Timer for preparation and recording
   useEffect(() => {
@@ -143,7 +149,7 @@ function InterviewPracticePage() {
   }, []);
 
   const startRecording = useCallback(async () => {
-    if (!streamRef.current || !question) return;
+    if (!streamRef.current || !appState.selectedQuestion) return;
 
     try {
       recordedChunksRef.current = [];
@@ -164,8 +170,8 @@ function InterviewPracticePage() {
         
         // Store recording data for analysis
         const recordingData = {
-          questionId: question.id,
-          question: question.text,
+          questionId: appState.selectedQuestion.id,
+          question: appState.selectedQuestion.text,
           recordingBlob: blob,
           duration: recordingState.currentTime,
           timestamp: new Date().toISOString()
@@ -203,7 +209,7 @@ function InterviewPracticePage() {
       
       setError(errorMessage);
     }
-  }, [question, router, recordingState.currentTime]);
+  }, [appState.selectedQuestion, router, recordingState.currentTime]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -222,7 +228,7 @@ function InterviewPracticePage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const timeLimit = question?.timeLimit || 120;
+  const timeLimit = appState.selectedQuestion?.timeLimit || 120;
   const isTimeUp = recordingState.currentTime >= timeLimit;
 
   // Auto-stop recording when time is up
@@ -231,6 +237,26 @@ function InterviewPracticePage() {
       stopRecording();
     }
   }, [isTimeUp, recordingState.isRecording, stopRecording]);
+
+  // Question selection functions
+  const selectQuestion = useCallback((selectedQuestion: InterviewQuestion) => {
+    setAppState({
+      showQuestionSelection: false,
+      selectedQuestion
+    });
+  }, []);
+
+  const selectRandomQuestion = useCallback(() => {
+    const randomQuestion = getRandomQuestion();
+    selectQuestion(randomQuestion);
+  }, [selectQuestion]);
+
+  const skipPreparationTime = useCallback(() => {
+    setRecordingState(prev => ({
+      ...prev,
+      preparationTime: 0
+    }));
+  }, []);
 
   if (error) {
     return (
@@ -249,7 +275,73 @@ function InterviewPracticePage() {
     );
   }
 
-  if (!question) {
+  // Show question selection screen
+  if (appState.showQuestionSelection) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                onClick={() => router.push('/interview')}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeftIcon className="h-4 w-4" />
+                <span>戻る</span>
+              </Button>
+            </div>
+
+            {/* Question Selection */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-6">面接質問を選択してください</h1>
+              
+              {/* Random Question Button */}
+              <div className="mb-6">
+                <Button
+                  size="lg"
+                  onClick={selectRandomQuestion}
+                  className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <span>🎲</span>
+                  <span>ランダム質問で練習</span>
+                </Button>
+              </div>
+
+              <div className="text-center text-gray-500 mb-6">または</div>
+
+              {/* Question List */}
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">質問一覧から選択</h2>
+                <div className="grid gap-3">
+                  {questions.map((q) => (
+                    <button
+                      key={q.id}
+                      onClick={() => selectQuestion(q)}
+                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-sm text-blue-600 font-medium">
+                          {q.category === 'general' ? '一般質問' : '行動面接'}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {Math.floor((q.timeLimit || 120) / 60)}分{((q.timeLimit || 120) % 60)}秒
+                        </span>
+                      </div>
+                      <p className="text-gray-800">{q.text}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    );
+  }
+
+  if (!appState.selectedQuestion) {
     return (
       <ProtectedRoute>
         <Layout>
@@ -332,11 +424,21 @@ function InterviewPracticePage() {
 
           {/* Question Section */}
           <div className="bg-blue-50 rounded-lg p-4 md:p-6">
-            <h2 className="text-base md:text-lg font-semibold text-blue-900 mb-2 md:mb-3">
-              質問 ({question.category === 'general' ? '一般' : '行動面接'})
-            </h2>
+            <div className="flex justify-between items-start mb-2 md:mb-3">
+              <h2 className="text-base md:text-lg font-semibold text-blue-900">
+                質問 ({appState.selectedQuestion.category === 'general' ? '一般' : '行動面接'})
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAppState({ showQuestionSelection: true, selectedQuestion: null })}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                質問を変更
+              </Button>
+            </div>
             <p className="text-blue-800 text-sm md:text-lg leading-relaxed">
-              {question.text}
+              {appState.selectedQuestion.text}
             </p>
           </div>
 
@@ -367,13 +469,20 @@ function InterviewPracticePage() {
             )}
 
             {recordingState.isPreparing && (
-              <div className="text-center">
+              <div className="text-center space-y-3">
                 <div className="text-gray-600">
                   質問を確認し、準備してください
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
+                <div className="text-sm text-gray-500">
                   {recordingState.preparationTime}秒後に自動的に録画が開始されます
                 </div>
+                <Button
+                  variant="outline"
+                  onClick={skipPreparationTime}
+                  className="flex items-center space-x-2"
+                >
+                  <span>準備時間をスキップ</span>
+                </Button>
               </div>
             )}
           </div>
@@ -387,7 +496,7 @@ function InterviewPracticePage() {
                 <li>• <strong>環境</strong>: 明るく静かな場所で録画してください</li>
                 <li>• <strong>話し方</strong>: はっきりと話し、適切な声量を保ってください</li>
                 <li>• <strong>構成</strong>: 結論→理由→具体例→まとめの順で話してください</li>
-                <li>• <strong>時間</strong>: 制限時間は{Math.floor((question?.timeLimit || 120) / 60)}分{((question?.timeLimit || 120) % 60)}秒です</li>
+                <li>• <strong>時間</strong>: 制限時間は{Math.floor((appState.selectedQuestion?.timeLimit || 120) / 60)}分{((appState.selectedQuestion?.timeLimit || 120) % 60)}秒です</li>
               </ul>
             </div>
           )}

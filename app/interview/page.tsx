@@ -23,7 +23,7 @@ function InterviewStartPage() {
           </h1>
           <p className="text-gray-600">
             AIが面接官となってリアルな面接体験を提供します。<br />
-            質問形式で気軽に練習するか、動画で本格的に練習するか選べます。
+            質問を選択して動画で本格的に練習しましょう。
           </p>
         </div>
 
@@ -66,27 +66,19 @@ function InterviewStartPage() {
         {/* Instructions */}
         <div className="bg-blue-50 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-blue-900 mb-4">
-            練習モードの特徵
+            動画面接練習の特徴
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-blue-900 mb-2">📝 質問形式練習</h3>
-              <ul className="space-y-1 text-blue-800 text-sm">
-                <li>• 複数の質問に文章で回答</li>
-                <li>• 30秒の準備時間（スキップ可能）</li>
-                <li>• ランダムまたは選択式</li>
-                <li>• 10-15分で完了</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-900 mb-2">🎥 動画練習</h3>
-              <ul className="space-y-1 text-blue-800 text-sm">
-                <li>• カメラで動画録画</li>
-                <li>• 本格的な面接体験</li>
-                <li>• AIが詳細分析</li>
-                <li>• 1問あたり5-10分</li>
-              </ul>
-            </div>
+          <div className="space-y-3">
+            <h3 className="font-semibold text-blue-900 mb-2">🎥 動画練習</h3>
+            <ul className="space-y-1 text-blue-800 text-sm">
+              <li>• 質問を選択してから練習開始</li>
+              <li>• ランダムまたは質問一覧から選択</li>
+              <li>• 30秒の準備時間（スキップ可能）</li>
+              <li>• カメラで動画録画</li>
+              <li>• 本格的な面接体験</li>
+              <li>• AIが詳細分析</li>
+              <li>• 1問あたり5-10分</li>
+            </ul>
           </div>
         </div>
 
@@ -107,20 +99,12 @@ function InterviewStartPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Link href="/interview/questions">
-            <Button size="lg" className="w-full h-auto py-4">
+        <div className="flex justify-center">
+          <Link href="/interview/practice" className="w-full max-w-md">
+            <Button size="lg" className="w-full h-auto py-6">
               <div className="text-center">
-                <div className="text-lg font-bold mb-1">📝 質問形式練習</div>
-                <div className="text-sm opacity-90">複数の質問に文章で回答</div>
-              </div>
-            </Button>
-          </Link>
-          <Link href="/interview/practice">
-            <Button size="lg" variant="outline" className="w-full h-auto py-4">
-              <div className="text-center">
-                <div className="text-lg font-bold mb-1">🎥 動画練習</div>
-                <div className="text-sm opacity-90">動画で面接練習</div>
+                <div className="text-2xl font-bold mb-2">🎥 面接練習を始める</div>
+                <div className="text-sm opacity-90">質問を選んで動画で面接練習</div>
               </div>
             </Button>
           </Link>
