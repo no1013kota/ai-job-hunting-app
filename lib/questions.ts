@@ -41,3 +41,6 @@ export const getRandomQuestion = (): InterviewQuestion => {
 export const getQuestionById = (id: string): InterviewQuestion | undefined => {
   return interviewQuestions.find(q => q.id === id);
 };
+
+// questions として export も追加
+export const questions = interviewQuestions;

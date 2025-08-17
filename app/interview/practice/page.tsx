@@ -1,5 +1,8 @@
 'use client';
 
+// Dynamic page - disable SSG to prevent build errors
+export const dynamic = 'force-dynamic';
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ProtectedRoute } from '@/hooks/useAuth';
 import { Layout } from '@/components/Layout';
