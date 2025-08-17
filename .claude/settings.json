@@ -1,0 +1,20 @@
+{
+  "project_name": "AI-Job-Hunting",
+  "description": "AI-powered job hunting assistance and automation tools",
+  "preferences": {
+    "file_search_optimization": true,
+    "parallel_processing": true,
+    "memory_management": "project_specific",
+    "auto_documentation": false
+  },
+  "tools": {
+    "preferred_search": "Task",
+    "code_analysis": "advanced",
+    "testing_framework": "auto_detect"
+  },
+  "hooks": {
+    "pre_commit": ["lint", "type_check"],
+    "post_commit": ["memory_update"],
+    "file_change": ["analysis"]
+  }
+}

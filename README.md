@@ -1,36 +1,165 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤖 AI就活アシスタント
 
-## Getting Started
+AIを活用した就職活動サポートアプリケーション。面接練習、企業研究、適性診断、ES作成支援など、就活に必要な機能を統合的に提供します。
 
-First, run the development server:
+## ✨ 主な機能
+
+### 🎤 面接練習
+- **質問形式練習**: 複数の面接質問に文章で回答
+- **動画練習**: カメラを使用した本格的な面接シミュレーション
+- **ランダム出題**: 予想外の質問への対応力を鍛える
+- **30秒準備時間**: スキップ可能な考える時間
+
+### 🏢 企業内定率検索
+- **詳細な企業データ**: 内定率、年収、ワークライフバランス等
+- **検索・フィルタリング**: 業界、規模、地域での絞り込み
+- **ランキング表示**: 内定率・年収トップ10
+- **選考プロセス**: ステップバイステップの選考情報
+
+### 📊 AI適性診断
+- 7軸評価システムによる適性分析
+- あなたに最適な職種・業界の提案
+- パーソナライズされたキャリアアドバイス
+
+### 📝 ES作成サポート
+- AI による文章分析・添削
+- 企業別最適化アドバイス
+- リアルタイムフィードバック
+
+### 🎮 ゲーミフィケーション
+- **レベルシステム**: 学習進度を可視化
+- **バッジ・アチーブメント**: 達成感を提供
+- **連続学習ストリーク**: Duolingo風継続モチベーション
+- **デイリーミッション**: 毎日の学習目標
+
+## 🚀 技術スタック
+
+- **フレームワーク**: Next.js 15
+- **言語**: TypeScript
+- **UI ライブラリ**: Tailwind CSS 4
+- **アイコン**: Heroicons
+- **状態管理**: React hooks + Context API
+- **ストレージ**: IndexedDB（ローカル）
+- **PWA対応**: Service Worker + Manifest
+
+## 📦 セットアップ
+
+### 前提条件
+- Node.js 18.0 以上
+- npm または yarn
+
+### インストール
 
 ```bash
+# リポジトリをクローン
+git clone https://github.com/your-username/ai-job-hunting-app.git
+cd ai-job-hunting-app
+
+# 依存関係をインストール
+npm install
+
+# 環境変数を設定
+cp .env.example .env.local
+# .env.local を編集して必要な値を設定
+
+# 開発サーバーを起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いて確認してください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 デプロイ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Vercel（推奨）
 
-## Learn More
+1. Vercel アカウントを作成
+2. GitHub リポジトリと連携
+3. プロジェクトをインポート
+4. 環境変数を設定（必要に応じて）
+5. デプロイ実行
 
-To learn more about Next.js, take a look at the following resources:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### その他のプラットフォーム
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# ビルド
+npm run build
 
-## Deploy on Vercel
+# 本番サーバー起動
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📱 PWA機能
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- オフライン対応
+- インストール可能
+- プッシュ通知（予定）
+- バックグラウンド同期（予定）
+
+## 🔧 環境変数
+
+| 変数名 | 説明 | デフォルト値 |
+|--------|------|-------------|
+| `NEXT_PUBLIC_APP_NAME` | アプリケーション名 | AI就活アシスタント |
+| `NEXT_PUBLIC_APP_URL` | アプリケーションURL | http://localhost:3000 |
+| `DATABASE_URL` | データベースURL（オプション） | - |
+| `OPENAI_API_KEY` | OpenAI APIキー（オプション） | - |
+
+## 📁 プロジェクト構造
+
+```
+ai-job-hunting/
+├── app/                      # Next.js App Router
+│   ├── companies/           # 企業検索機能
+│   ├── interview/           # 面接練習機能
+│   ├── assessment/          # 適性診断機能
+│   ├── es-support/          # ES作成支援
+│   ├── dashboard/           # ダッシュボード
+│   └── auth/               # 認証機能
+├── components/              # 再利用可能コンポーネント
+│   ├── ui/                 # UI基本コンポーネント
+│   └── gamification/       # ゲーミフィケーション
+├── lib/                    # ユーティリティ・データ
+├── hooks/                  # カスタムフック
+├── contexts/               # React Context
+├── types/                  # TypeScript型定義
+└── public/                 # 静的ファイル
+```
+
+## 🎯 今後の予定機能
+
+- [ ] 実際のAI面接官（GPT-4統合）
+- [ ] 企業データの自動更新
+- [ ] ユーザー同士の情報共有機能
+- [ ] 選考スケジュール管理
+- [ ] メール/SMS通知
+- [ ] データ分析・レポート機能
+
+## 🤝 コントリビュート
+
+プルリクエストやイシューはいつでも歓迎します。
+
+1. プロジェクトをフォーク
+2. フィーチャーブランチを作成 (`git checkout -b feature/AmazingFeature`)
+3. 変更をコミット (`git commit -m 'Add some AmazingFeature'`)
+4. ブランチにプッシュ (`git push origin feature/AmazingFeature`)
+5. プルリクエストを作成
+
+## 📄 ライセンス
+
+MIT ライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルをご覧ください。
+
+## 📞 サポート
+
+質問や提案がありましたら、[Issues](https://github.com/your-username/ai-job-hunting-app/issues) でお知らせください。
+
+## 🙏 謝辞
+
+- [Next.js](https://nextjs.org/) - 素晴らしいReactフレームワーク
+- [Tailwind CSS](https://tailwindcss.com/) - 効率的なCSS設計
+- [Heroicons](https://heroicons.com/) - 美しいアイコンセット
+
+---
+
+**Made with ❤️ for job seekers in Japan**
